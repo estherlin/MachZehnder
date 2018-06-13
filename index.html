@@ -1,1 +1,53 @@
-<h1>Hello World!</h1>
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title>Mach-Zehnder Interferometer Simulation</title>
+        <meta name="viewport" content="width=device-width, user-scalable=no,
+            minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+			body {
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+			}
+			a {
+				color: #ff0080;
+				text-decoration: none;
+			}
+			a:hover {
+				color: #0080ff;
+			}
+		</style>
+	</head>
+	<body>
+        <div id="info">
+            <a href="https://en.wikipedia.org/wiki/Mach–Zehnder_interferometer"
+                target="_blank" rel="noopener">Mach-Zehnder Interferometer</a>
+            <br />
+            Using real world scale: Brick cube is 1 meter in size.
+            Light is 2 meters from floor.  Globe is 25 cm in diameter.<br/>
+            Using Reinhard inline tonemapping with real-world light falloff.
+        </div>
+
+        <div id="container"></div>
+
+        <script src="js/three.js"></script>
+        <script src="js/stats.min.js"></script>
+        <script src="js/dat.gui.min.js"></script>
+        <script src="js/OrbitControls.js"></script>
+        <script src="js/Detector.js"></script>
+        <script src="js/jquery.min.js"></script>
+        <script src="test.js"></script>
+
+	</body>
+</html>
