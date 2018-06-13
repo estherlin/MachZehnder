@@ -1,9 +1,8 @@
 $(document).ready(function () {
-    if (!Detector.webgl) {
 
+    if (!Detector.webgl) {
         Detector.addGetWebGLMessage();
         document.getElementById('container').innerHTML = "";
-
     }
 
     /*
@@ -15,6 +14,9 @@ $(document).ready(function () {
     // The material parameters for the floor, mirrors, beam splitter cubes and screen
     var screenMat, cubeMat, floorMat, planeMat, laserMat;
 
+    // Variables for the laser output
+    var beamMat;
+
     // lighting variables
     var bulbLight, bulbMat, hemiLight;
 
@@ -23,6 +25,7 @@ $(document).ready(function () {
 
     // Other variables that are needed (idk why)
     var object, loader, stats;
+    var previousShadowMap = false;
 
 	// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
 	var hemiLuminousIrradiances = {
@@ -47,12 +50,13 @@ $(document).ready(function () {
 
     // parameters to vary in interactive simulation
     var params = {
-        exposure: 0.68,
+        exposure: 0.8,
         hemiIrradiance: Object.keys( hemiLuminousIrradiances )[3],
         sampleAngle: 0,
         mirrorAngle: 0,
         shadows: true,
         bulbPower: Object.keys( bulbLuminousPowers )[ 4 ],
+        laserFluence: 5
     }
 
     var clock = new THREE.Clock(); // keeps track of time
@@ -101,7 +105,7 @@ $(document).ready(function () {
         // Add the floor for this simulation
         floorMat = new THREE.MeshStandardMaterial( {
             roughness: 0.9,
-            color: 0x283747,
+            color: 0x17202A,
             metalness: 0.2,
             bumpScale: 0.0015
         });
@@ -180,6 +184,61 @@ $(document).ready(function () {
         laser.castShadow = true;
         scene.add( laser );
 
+        // TODO: Add the laser beams
+        //Beam 1
+        var beamMat1 = new THREE.LineBasicMaterial( {
+            color: 0x0000ff,
+            linewidth: 5
+        } );
+        var beamGeometry1 = new THREE.Geometry();
+        beamGeometry1.vertices.push(
+        	new THREE.Vector3( -position, 0.35, -position-2.5 ),
+        	new THREE.Vector3( -position, 0.4, -position )
+        );
+        beam1 = new THREE.Line(beamGeometry1, beamMat1);
+        scene.add(beam1);
+
+        // Beam 2
+        var beamMat2 = new THREE.LineBasicMaterial( {
+            color: 0x0000ff,
+            linewidth: 2.5
+        } );
+        var beamGeometry2 = new THREE.Geometry();
+        beamGeometry2.vertices.push(
+            new THREE.Vector3( -position, 0.4, -position ),
+            new THREE.Vector3( -position, 0.5, position ),
+            new THREE.Vector3( position, 0.4, position )
+        );
+        beam2 = new THREE.Line(beamGeometry2, beamMat2);
+        scene.add(beam2);
+
+        // Beam 3
+        var beamMat3 = new THREE.LineBasicMaterial( {
+            color: 0x0000ff,
+            linewidth: 2.5
+        } );
+        var beamGeometry3 = new THREE.Geometry();
+        beamGeometry3.vertices.push(
+            new THREE.Vector3( -position, 0.4, -position ),
+            new THREE.Vector3( position, 0.5, -position ),
+            new THREE.Vector3( position, 0.4, position )
+        );
+        beam3 = new THREE.Line(beamGeometry3, beamMat3);
+        scene.add(beam3);
+
+        // Beam 4
+        var beamMat4 = new THREE.LineBasicMaterial( {
+            color: 0x0000ff,
+            linewidth: 9.0
+        } );
+        var beamGeometry4 = new THREE.Geometry();
+        beamGeometry4.vertices.push(
+            new THREE.Vector3( position, 0.4, position ),
+            new THREE.Vector3( position, 0.5, position+2.5 )
+        );
+        beam4= new THREE.Line(beamGeometry4, beamMat4);
+        scene.add(beam4);
+
         // Initialize the renderer
         renderer = new THREE.WebGLRenderer();
         renderer.physicallyCorrectLights = true;
@@ -199,6 +258,9 @@ $(document).ready(function () {
         gui.add( params, 'bulbPower', Object.keys( bulbLuminousPowers ) );
         gui.add( params, 'exposure', 0, 1 );
         gui.add( params, 'shadows' );
+        gui.add( params, 'laserFluence', 1, 10 ).onChange( function ( val ) {
+            beamMat1.lineWidth = val;
+        } );
         gui.open();
     }
 
@@ -230,7 +292,17 @@ $(document).ready(function () {
         object.rotateZ(degreeZ);
     }
 
-    var previousShadowMap = false;
+    /*
+     * Function to get the centre point of the object
+     * To get the change in phase.
+     */
+    function getCenterPoint(mesh) {
+        var geometry = mesh.geometry;
+        geometry.computeBoundingBox();
+        center = geometry.boundingBox.getCenter();
+        mesh.localToWorld( center );
+        return center;
+    }
 
     /*
      * Render lighting of the simulation
@@ -255,5 +327,4 @@ $(document).ready(function () {
 		renderer.render( scene, camera );
 		stats.update();
 	}
-
 });
