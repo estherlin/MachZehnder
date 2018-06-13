@@ -18,7 +18,10 @@ $(document).ready(function () {
     // lighting variables
     var bulbLight, bulbMat, hemiLight;
 
-    // Other variables (idk why)
+    // Some dimensional parameters
+    var position = 2.5;
+
+    // Other variables that are needed (idk why)
     var object, loader, stats;
 
 	// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
@@ -112,6 +115,8 @@ $(document).ready(function () {
 
         // Add the beam splitter cubes for this simulation
         cubeMat = new THREE.MeshStandardMaterial( {
+            transparent: true,
+            opacity: 0.3,
             roughness: 0.7,
             color: 0x5dade2,
             bumpScale: 0.002,
@@ -120,43 +125,44 @@ $(document).ready(function () {
 
         var boxGeometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5 );
         var boxMesh1 = new THREE.Mesh( boxGeometry, cubeMat );
-        boxMesh1.position.set( -2.5, 0.25, -2.5 );
+        boxMesh1.position.set( -position, 0.4, -position );
         boxMesh1.castShadow = true;
         scene.add( boxMesh1 );
         var boxMesh2 = new THREE.Mesh( boxGeometry, cubeMat );
-        boxMesh2.position.set( 2.5, 0.25, 2.5 );
+        boxMesh2.position.set( position, 0.4, position );
         boxMesh2.castShadow = true;
         scene.add( boxMesh2 );
 
         // TODO: Add the mirrors - need to turn them to 45 degrees
         var planeMat = new THREE.MeshBasicMaterial( {
+            transparent: true,
+            opacity: 0.6,
+            reflectivity: 1.0,
             color: 0xF8F9F9,
-            side: THREE.DoubleSide,
-            emissive: 0xffffee,
-            emissiveIntensity: 1
+            side: THREE.DoubleSide
         } );
 
-        var planeGeometry = new THREE.PlaneBufferGeometry( 0.5, 0.5, 0.5 );
+        var planeGeometry = new THREE.CircleBufferGeometry( 0.5, 32 );;
         var mirror1 = new THREE.Mesh( planeGeometry, planeMat);
-        mirror1.position.set( -2.5, 0.25, 2.5 );
+        mirror1.rotateY( -Math.PI / 4 );
+        mirror1.position.set( -position, 0.5, position );
         mirror1.castShadow = true;
         scene.add( mirror1 );
         var mirror2 = new THREE.Mesh( planeGeometry, planeMat);
-        mirror2.position.set( 2.5, 0.25, -2.5 );
+        mirror2.rotateY( -Math.PI / 4 );
+        mirror2.position.set( position, 0.5, -position );
         mirror2.castShadow = true;
         scene.add( mirror2 );
 
         // TODO: Add the screen
         var screenMat = new THREE.MeshBasicMaterial( {
             color: 0xF8F9F9,
-            side: THREE.DoubleSide,
-            emissive: 0xffffff,
-            emissiveIntensity: 1
+            side: THREE.DoubleSide
         } );
 
         var screenGeometry = new THREE.PlaneBufferGeometry( 1.5, 1.5, 1.5 );
         var screen1 = new THREE.Mesh( screenGeometry, screenMat);
-        screen1.position.set( 2.5, 0.25, 5);
+        screen1.position.set( position, 0.5, position+2.5);
         screen1.castShadow = true;
         scene.add( screen1 );
 
@@ -170,7 +176,7 @@ $(document).ready(function () {
 
         var laserGeometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 1.4 );
         var laser = new THREE.Mesh( laserGeometry, laserMat );
-        laser.position.set( -2.5, 0.35, -5.5 );
+        laser.position.set( -position, 0.35, -position-2.5 );
         laser.castShadow = true;
         scene.add( laser );
 
@@ -208,6 +214,20 @@ $(document).ready(function () {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize( window.innerWidth, window.innerHeight );
+    }
+
+    /*
+     * Rotates object for interactive simulation
+     */
+    function rotateObject(object,degreeX=0, degreeY=0, degreeZ=0){
+
+        degreeX = (degreeX * Math.PI)/180;
+        degreeY = (degreeY * Math.PI)/180;
+        degreeZ = (degreeZ * Math.PI)/180;
+
+        object.rotateX(degreeX);
+        object.rotateY(degreeY);
+        object.rotateZ(degreeZ);
     }
 
     var previousShadowMap = false;
