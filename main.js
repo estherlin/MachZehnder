@@ -57,11 +57,17 @@ $(document).ready(function () {
         mirrorAngle: 0,
         shadows: true,
         bulbPower: Object.keys( bulbLuminousPowers )[ 4 ],
+<<<<<<< HEAD
         laserFluence: 5,
         refractiveIndex: 1
+=======
+        laserFluence: 2
+>>>>>>> beam
     }
 
     var clock = new THREE.Clock(); // keeps track of time
+
+    // Colours for beam
 
     // Start the simulation
     init();
@@ -172,6 +178,7 @@ $(document).ready(function () {
         screen1.castShadow = true;
         scene.add( screen1 );
 
+<<<<<<< HEAD
         // TODO: Add the sample
         sampleMat= new THREE.MeshStandardMaterial( {
             transparent: true,
@@ -187,6 +194,13 @@ $(document).ready(function () {
         sample.position.set( -position, 0.4, 0 );
         sample.castShadow = true;
         scene.add( sample );
+=======
+        var screen2 = new THREE.Mesh( screenGeometry, screenMat);
+        screen2.position.set( position+2.5, 0.5, position);
+        screen2.rotateY( -Math.PI / 2 );
+        screen2.castShadow = true;
+        scene.add( screen2 );
+>>>>>>> beam
 
         // TODO: Add the laser
         var laserMat = new THREE.MeshStandardMaterial( {
@@ -203,6 +217,7 @@ $(document).ready(function () {
         scene.add( laser );
 
         // TODO: Add the laser beams
+<<<<<<< HEAD
         //Beam 1
         var beamMat1 = new THREE.LineBasicMaterial( {
             color: 0x58d68d,
@@ -223,13 +238,31 @@ $(document).ready(function () {
         } );
         var beamGeometry2 = new THREE.Geometry();
         beamGeometry2.vertices.push(
+=======
+        var beamMat = new MeshLineMaterial({
+            color: new THREE.Color( 0x2ecc71  ),
+            opacity: 0.7,//params.strokes ? .5 : 1,
+            lineWidth: params.laserFluence,
+            transparent: true,
+            side: THREE.DoubleSide
+        });
+
+        //Beam 1
+        var beam1Geometry = new THREE.Geometry();
+        beam1Geometry.vertices.push(
+            new THREE.Vector3( -position, 0.35, -position-2.5 ),
+>>>>>>> beam
             new THREE.Vector3( -position, 0.4, -position ),
             new THREE.Vector3( -position, 0.5, position ),
-            new THREE.Vector3( position, 0.4, position )
+            new THREE.Vector3( position, 0.4, position ),
+            new THREE.Vector3( position, 0.5, position+2.5)
         );
-        beam2 = new THREE.Line(beamGeometry2, beamMat2);
-        scene.add(beam2);
+        var beam1 = new MeshLine();
+        beam1.setGeometry( beam1Geometry, function( p ) { return 0.05*p } );
+        var beam1Mesh = new THREE.Mesh( beam1.geometry, beamMat );
+        scene.add( beam1Mesh );
 
+<<<<<<< HEAD
         // Beam 3
         var beamMat3 = new THREE.LineBasicMaterial( {
             color: 0x58d68d,
@@ -251,11 +284,21 @@ $(document).ready(function () {
         } );
         var beamGeometry4 = new THREE.Geometry();
         beamGeometry4.vertices.push(
+=======
+        // Beam 2
+        var beam2Geometry = new THREE.Geometry();
+        beam2Geometry.vertices.push(
+            new THREE.Vector3( -position, 0.35, -position-2.5 ),
+            new THREE.Vector3( -position, 0.4, -position ),
+            new THREE.Vector3( position, 0.5, -position ),
+>>>>>>> beam
             new THREE.Vector3( position, 0.4, position ),
-            new THREE.Vector3( position, 0.5, position+2.5 )
+            new THREE.Vector3( position+2.5, 0.5, position)
         );
-        beam4= new THREE.Line(beamGeometry4, beamMat4);
-        scene.add(beam4);
+        var beam2 = new MeshLine();
+        beam2.setGeometry( beam2Geometry, function( p ) { return 0.05*p } );
+        var beam2Mesh = new THREE.Mesh( beam2.geometry, beamMat );
+        scene.add( beam2Mesh );
 
         // Initialize the renderer
         renderer = new THREE.WebGLRenderer();
