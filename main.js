@@ -205,7 +205,7 @@ $(document).ready(function () {
         // TODO: Add the laser beams
         //Beam 1
         var beamMat1 = new THREE.LineBasicMaterial( {
-            color: 0x0000ff,
+            color: 0x58d68d,
             linewidth: 5
         } );
         var beamGeometry1 = new THREE.Geometry();
@@ -218,7 +218,7 @@ $(document).ready(function () {
 
         // Beam 2
         var beamMat2 = new THREE.LineBasicMaterial( {
-            color: 0x0000ff,
+            color: 0x58d68d,
             linewidth: 2.5
         } );
         var beamGeometry2 = new THREE.Geometry();
@@ -232,7 +232,7 @@ $(document).ready(function () {
 
         // Beam 3
         var beamMat3 = new THREE.LineBasicMaterial( {
-            color: 0x0000ff,
+            color: 0x58d68d,
             linewidth: 2.5
         } );
         var beamGeometry3 = new THREE.Geometry();
@@ -246,7 +246,7 @@ $(document).ready(function () {
 
         // Beam 4
         var beamMat4 = new THREE.LineBasicMaterial( {
-            color: 0x0000ff,
+            color: 0x58d68d,
             linewidth: 9.0
         } );
         var beamGeometry4 = new THREE.Geometry();
