@@ -24,8 +24,9 @@ $(document).ready(function () {
     var stats;
     var previousShadowMap = false;
 
-    // Variables for the beams
+    // Variables for simulation
     var beams = [];
+    var samples = [];
 
 	// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
 	var hemiLuminousIrradiances = {
@@ -57,8 +58,9 @@ $(document).ready(function () {
         mirrorAngle: 0,
         shadows: true,
         bulbPower: Object.keys( bulbLuminousPowers )[ 4 ],
-        beamWidth: 3.0,
-        refractiveIndex: 1
+        beamWidth: 2.0,
+        refractiveIndex: 1,
+        sampleAngle: 0.0
     }
 
     var clock = new THREE.Clock(); // keeps track of time
@@ -133,11 +135,11 @@ $(document).ready(function () {
 
         var boxGeometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5 );
         var boxMesh1 = new THREE.Mesh( boxGeometry, cubeMat );
-        boxMesh1.position.set( -position, 0.4, -position );
+        boxMesh1.position.set( -position, 0.5, -position );
         boxMesh1.castShadow = true;
         scene.add( boxMesh1 );
         var boxMesh2 = new THREE.Mesh( boxGeometry, cubeMat );
-        boxMesh2.position.set( position, 0.4, position );
+        boxMesh2.position.set( position, 0.5, position );
         boxMesh2.castShadow = true;
         scene.add( boxMesh2 );
 
@@ -181,20 +183,7 @@ $(document).ready(function () {
         scene.add( screen2 );
 
         // TODO: Add the sample
-        sampleMat= new THREE.MeshStandardMaterial( {
-            transparent: true,
-            opacity: 0.3,
-            roughness: 0.7,
-            color: 0x5dade2,
-            bumpScale: 0.002,
-            metalness: 0.2
-        });
-
-        var sampleGeometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.1 );
-        var sample = new THREE.Mesh( sampleGeometry, sampleMat );
-        sample.position.set( -position, 0.4, 0 );
-        sample.castShadow = true;
-        scene.add( sample );
+        createSamples();
 
         // TODO: Add the laser source
         var laserMat = new THREE.MeshStandardMaterial( {
@@ -236,10 +225,15 @@ $(document).ready(function () {
     function initGui() {
         var gui = new dat.GUI();
 
-        function update() {
+        function updateBeams() {
 			clearBeams();
 			createBeams();
     	}
+
+        function updateSamples() {
+            clearSamples();
+            createSamples();
+        }
 
         // folder 1: all of the view options
         var folder1 = gui.addFolder( 'View Parameters' );
@@ -249,13 +243,17 @@ $(document).ready(function () {
         folder1.add( params, 'shadows' );
 
         // folder 2: all of the view options
-        var folder2 = gui.addFolder( 'Simulation Parameters' );
-        folder2.add( params, 'refractiveIndex', 0.0, 1.0, 0.1 );
-        folder2.add( params, 'beamWidth', 0.0, 5.0, 0.5).onChange( update);
+        var folder2 = gui.addFolder( 'Laser Parameters' );
+        folder2.add( params, 'beamWidth', 0.0, 5.0, 0.5).onChange( updateBeams );
+
+        var folder3 = gui.addFolder( 'Sample Parameters' );
+        folder3.add( params, 'refractiveIndex', 0.0, 1.8, 0.1 ).onChange( updateSamples );
+        folder3.add( params, 'sampleAngle', -45.0, 45.0, 2.0 ).onChange( updateSamples );
 
         // open the folders for them to take into effect
         folder1.open();
         folder2.open();
+        folder3.open();
 
         gui.open();
     }
@@ -274,11 +272,37 @@ $(document).ready(function () {
         renderer.setSize( window.innerWidth, window.innerHeight );
     }
 
+    function clearSamples() {
+        samples.forEach( function ( l ) {
+            scene.remove( l );
+        });
+        samples = [];
+    }
+
     function clearBeams() {
         beams.forEach( function ( l ) {
             scene.remove( l );
         });
         beams = [];
+    }
+
+    function createSamples() {
+        var sampleMat = new THREE.MeshStandardMaterial( {
+            transparent: true,
+            opacity: params.refractiveIndex / 2,
+            roughness: 0.7,
+            color: 0x5dade2,
+            bumpScale: 0.002,
+            metalness: 0.2
+        });
+
+        var sampleGeometry = new THREE.BoxBufferGeometry( 0.75, 0.55, 0.1 );
+        var sample = new THREE.Mesh( sampleGeometry, sampleMat );
+        sample.position.set( -position, 0.4, 0 );
+        sample.rotateY( (params.sampleAngle * Math.PI)/180);
+        sample.castShadow = true;
+        scene.add( sample );
+        samples.push( sample );
     }
 
     function createBeams() {
@@ -302,7 +326,7 @@ $(document).ready(function () {
         );
         beam1Geometry.buffersNeedUpdate = true;
         var beam1 = new MeshLine();
-        beam1.setGeometry( beam1Geometry, function( p ) { return 0.05*p } );
+        beam1.setGeometry( beam1Geometry, function( p ) { return 0.1*p } );
         var beam1Mesh = new THREE.Mesh( beam1.geometry, beamMat );
         scene.add( beam1Mesh );
         beams.push( beam1Mesh );
@@ -317,26 +341,12 @@ $(document).ready(function () {
             new THREE.Vector3( position+2.5, 0.5, position)
         );
         var beam2 = new MeshLine();
-        beam2.setGeometry( beam2Geometry, function( p ) { return 0.05*p } );
+        beam2.setGeometry( beam2Geometry, function( p ) { return 0.1*p } );
         var beam2Mesh = new THREE.Mesh( beam2.geometry, beamMat );
 
         scene.add( beam2Mesh );
         beams.push( beam2Mesh );
 
-    }
-
-    /*
-     * Rotates object for interactive simulation
-     */
-    function rotateObject(object,degreeX=0, degreeY=0, degreeZ=0){
-
-        degreeX = (degreeX * Math.PI)/180;
-        degreeY = (degreeY * Math.PI)/180;
-        degreeZ = (degreeZ * Math.PI)/180;
-
-        object.rotateX(degreeX);
-        object.rotateY(degreeY);
-        object.rotateZ(degreeZ);
     }
 
     /*
