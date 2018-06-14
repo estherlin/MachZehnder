@@ -291,7 +291,7 @@ $(document).ready(function () {
             transparent: true,
             opacity: params.refractiveIndex / 2,
             roughness: 0.7,
-            color: 0x5dade2,
+            color: 0xec7063,
             bumpScale: 0.002,
             metalness: 0.2
         });
