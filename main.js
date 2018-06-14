@@ -50,6 +50,7 @@ $(document).ready(function () {
 
     // parameters to vary in interactive simulation
     var params = {
+        // Static view parameters
         exposure: 0.8,
         hemiIrradiance: Object.keys( hemiLuminousIrradiances )[3],
         sampleAngle: 0,
@@ -270,18 +271,7 @@ $(document).ready(function () {
         window.addEventListener( 'resize', onWindowResize, false );
 
         // Add controls interface
-        var gui = new dat.GUI();
-        gui.add( params, 'hemiIrradiance', Object.keys( hemiLuminousIrradiances ) );
-        gui.add( params, 'bulbPower', Object.keys( bulbLuminousPowers ) );
-        gui.add( params, 'exposure', 0, 1 );
-        gui.add( params, 'shadows' );
-        gui.add( params, 'laserFluence', 1, 10 ).onChange( function ( val ) {
-            beamMat1.linewidth = val;
-            beamMat2.linewidth = val / 2;
-        } );
-        gui.add( params, 'refractiveIndex', 0, 1 );
-
-        gui.open();
+        initGui();
     }
 
     /*
@@ -292,14 +282,30 @@ $(document).ready(function () {
 
         // folder 1: all of the view options
         var folder1 = gui.addFolder( 'View Parameters' );
+        folder1.add( params, 'hemiIrradiance', Object.keys( hemiLuminousIrradiances ));
+        folder1.add( params, 'bulbPower', Object.keys( bulbLuminousPowers ) );
+        folder1.add( params, 'exposure', 0, 1 );
+        folder1.add( params, 'shadows' );
 
         // folder 2: all of the view options
-        var folder2 = gui.addFolder( 'View Parameters' );
+        var folder2 = gui.addFolder( 'Simulation Parameters' );
+        folder2.add( params, 'refractiveIndex', 0, 1 );
+        folder2.add( params, 'laserFluence', 1, 10 ).onChange( function ( val ) {
+            beamMat1.linewidth = val;
+            beamMat2.linewidth = val / 2;
+        } );
 
         // open the folders for them to take into effect
         folder1.open();
         folder2.open();
+
+        gui.open();
     }
+
+    /*
+     * Changes the values from the views from user input in controls
+     */
+
 
     /*
      * Renders the animation
