@@ -206,7 +206,7 @@ $(document).ready(function () {
         //Beam 1
         var beamMat1 = new THREE.LineBasicMaterial( {
             color: 0x58d68d,
-            linewidth: 5
+            linewidth: 2.5
         } );
         var beamGeometry1 = new THREE.Geometry();
         beamGeometry1.vertices.push(
@@ -247,7 +247,7 @@ $(document).ready(function () {
         // Beam 4
         var beamMat4 = new THREE.LineBasicMaterial( {
             color: 0x58d68d,
-            linewidth: 9.0
+            linewidth: 2.5
         } );
         var beamGeometry4 = new THREE.Geometry();
         beamGeometry4.vertices.push(
@@ -290,10 +290,7 @@ $(document).ready(function () {
         // folder 2: all of the view options
         var folder2 = gui.addFolder( 'Simulation Parameters' );
         folder2.add( params, 'refractiveIndex', 0, 1 );
-        folder2.add( params, 'laserFluence', 1, 10 ).onChange( function ( val ) {
-            beamMat1.linewidth = val;
-            beamMat2.linewidth = val / 2;
-        } );
+        folder2.add( params, 'laserFluence', 1, 10 );
 
         // open the folders for them to take into effect
         folder1.open();
@@ -301,11 +298,6 @@ $(document).ready(function () {
 
         gui.open();
     }
-
-    /*
-     * Changes the values from the views from user input in controls
-     */
-
 
     /*
      * Renders the animation
@@ -345,6 +337,13 @@ $(document).ready(function () {
         center = geometry.boundingBox.getCenter();
         mesh.localToWorld( center );
         return center;
+    }
+
+    /*
+     * Changes the values from the views from user input in controls
+     */
+    function updateSim() {
+
     }
 
     /*
