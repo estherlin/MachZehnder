@@ -5,9 +5,7 @@ $(document).ready(function () {
         document.getElementById('container').innerHTML = "";
     }
 
-    /*
-     * global variables
-     */
+    /* global variables */
     var container;
     var camera, scene, renderer;
 
