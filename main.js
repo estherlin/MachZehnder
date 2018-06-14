@@ -11,8 +11,8 @@ $(document).ready(function () {
     var container;
     var camera, scene, renderer;
 
-    // The material parameters for the floor, mirrors, beam splitter cubes and screen
-    var screenMat, cubeMat, floorMat, planeMat, laserMat;
+    // The material parameters for the floor, mirrors, beam splitter cubes, screen and sample
+    var screenMat, cubeMat, floorMat, planeMat, laserMat, sampleMat;
 
     // Variables for the laser output
     var beamMat;
@@ -21,7 +21,7 @@ $(document).ready(function () {
     var bulbLight, bulbMat, hemiLight;
 
     // Some dimensional parameters
-    var position = 2.5;
+    var position = 3;
 
     // Other variables that are needed (idk why)
     var object, loader, stats;
@@ -56,7 +56,8 @@ $(document).ready(function () {
         mirrorAngle: 0,
         shadows: true,
         bulbPower: Object.keys( bulbLuminousPowers )[ 4 ],
-        laserFluence: 5
+        laserFluence: 5,
+        refractiveIndex: 1
     }
 
     var clock = new THREE.Clock(); // keeps track of time
@@ -67,7 +68,7 @@ $(document).ready(function () {
 
     /*
      * Creates the scene by assigning scene, camera and renderer
-     *
+     * Also creates all elements of the simulation
      */
     function init() {
 
@@ -170,6 +171,22 @@ $(document).ready(function () {
         screen1.castShadow = true;
         scene.add( screen1 );
 
+        // TODO: Add the sample
+        sampleMat= new THREE.MeshStandardMaterial( {
+            transparent: true,
+            opacity: 0.3,
+            roughness: 0.7,
+            color: 0x5dade2,
+            bumpScale: 0.002,
+            metalness: 0.2
+        });
+
+        var sampleGeometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.1 );
+        var sample = new THREE.Mesh( sampleGeometry, sampleMat );
+        sample.position.set( -position, 0.4, 0 );
+        sample.castShadow = true;
+        scene.add( sample );
+
         // TODO: Add the laser
         var laserMat = new THREE.MeshStandardMaterial( {
             roughness: 0.1,
@@ -259,9 +276,29 @@ $(document).ready(function () {
         gui.add( params, 'exposure', 0, 1 );
         gui.add( params, 'shadows' );
         gui.add( params, 'laserFluence', 1, 10 ).onChange( function ( val ) {
-            beamMat1.lineWidth = val;
+            beamMat1.linewidth = val;
+            beamMat2.linewidth = val / 2;
         } );
+        gui.add( params, 'refractiveIndex', 0, 1 );
+
         gui.open();
+    }
+
+    /*
+     * Initializes and customizes the gui
+     */
+    function initGui() {
+        var gui = new dat.GUI();
+
+        // folder 1: all of the view options
+        var folder1 = gui.addFolder( 'View Parameters' );
+
+        // folder 2: all of the view options
+        var folder2 = gui.addFolder( 'View Parameters' );
+
+        // open the folders for them to take into effect
+        folder1.open();
+        folder2.open();
     }
 
     /*
