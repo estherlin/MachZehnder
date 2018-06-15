@@ -47,6 +47,26 @@ $(document).ready(function () {
         "Off": 0
     };
 
+    // laser types and their properties
+    var laserType = {
+        "HeNe 543nm": {
+            color: new THREE.Color( 0x2ecc71  ),
+            wavelength: 543*Math.pow(10,-9)
+        },
+        "HeNe 594 nm": {
+            color: new THREE.Color( 0xf7dc6f ),
+            wavelength: 594*Math.pow(10,-9)
+        },
+        "HeNe 612 nm": {
+            color: new THREE.Color( 0xe67e22 ),
+            wavelength: 612*Math.pow(10,-9)
+        },
+        "HeNe 633 nm": {
+            color: new THREE.Color( 0xe74c3c ),
+            wavelength: 633*Math.pow(10,-9)
+        }
+    };
+
     // parameters to vary in interactive simulation
     var params = {
         // Static view parameters
@@ -56,6 +76,7 @@ $(document).ready(function () {
         mirrorAngle: 0,
         shadows: true,
         bulbPower: Object.keys( bulbLuminousPowers )[ 4 ],
+        laserType: Object.keys( laserType )[ 0 ],
         beamWidth: 2.0,
         refractiveIndex: 1,
         sampleAngle: 0.0
@@ -243,6 +264,7 @@ $(document).ready(function () {
         // folder 2: all of the view options
         var folder2 = gui.addFolder( 'Laser Parameters' );
         folder2.add( params, 'beamWidth', 0.0, 5.0, 0.5).onChange( updateBeams );
+        folder2.add( params, 'laserType', Object.keys( laserType ) ).onChange( updateBeams );
 
         var folder3 = gui.addFolder( 'Sample Parameters' );
         folder3.add( params, 'refractiveIndex', 0.0, 1.8, 0.1 ).onChange( updateSamples );
@@ -305,7 +327,7 @@ $(document).ready(function () {
 
     function createBeams() {
         var beamMat = new MeshLineMaterial({
-            color: new THREE.Color( 0x2ecc71  ),
+            color: laserType[params.laserType].color,
             opacity: 0.7,//params.strokes ? .5 : 1,
             lineWidth: params.beamWidth,
             transparent: true,
