@@ -17,6 +17,7 @@ $(document).ready(function () {
 
     // Some dimensional parameters
     var position = 3;
+    var height = 0.5;
 
     // Other variables that are needed (idk why)
     var stats;
@@ -152,13 +153,13 @@ $(document).ready(function () {
             metalness: 0.2
         });
 
-        var boxGeometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5 );
+        var boxGeometry = new THREE.BoxBufferGeometry( 0.5, height, 0.5 );
         var boxMesh1 = new THREE.Mesh( boxGeometry, cubeMat );
         boxMesh1.position.set( -position, 0.5, -position );
         boxMesh1.castShadow = true;
         scene.add( boxMesh1 );
         var boxMesh2 = new THREE.Mesh( boxGeometry, cubeMat );
-        boxMesh2.position.set( position, 0.5, position );
+        boxMesh2.position.set( position, height, position );
         boxMesh2.castShadow = true;
         scene.add( boxMesh2 );
 
@@ -174,12 +175,12 @@ $(document).ready(function () {
         var planeGeometry = new THREE.CircleBufferGeometry( 0.5, 32 );;
         var mirror1 = new THREE.Mesh( planeGeometry, planeMat);
         mirror1.rotateY( -Math.PI / 4 );
-        mirror1.position.set( -position, 0.5, position );
+        mirror1.position.set( -position, height, position );
         mirror1.castShadow = true;
         scene.add( mirror1 );
         var mirror2 = new THREE.Mesh( planeGeometry, planeMat);
         mirror2.rotateY( -Math.PI / 4 );
-        mirror2.position.set( position, 0.5, -position );
+        mirror2.position.set( position, height, -position );
         mirror2.castShadow = true;
         scene.add( mirror2 );
 
@@ -191,12 +192,12 @@ $(document).ready(function () {
 
         var screenGeometry = new THREE.PlaneBufferGeometry( 1.5, 1.5, 1.5 );
         var screen1 = new THREE.Mesh( screenGeometry, screenMat);
-        screen1.position.set( position, 0.5, position+2.5);
+        screen1.position.set( position, height, position+2.5);
         screen1.castShadow = true;
         scene.add( screen1 );
 
         var screen2 = new THREE.Mesh( screenGeometry, screenMat);
-        screen2.position.set( position+2.5, 0.5, position);
+        screen2.position.set( position+2.5, height, position);
         screen2.rotateY( -Math.PI / 2 );
         screen2.castShadow = true;
         scene.add( screen2 );
@@ -214,7 +215,7 @@ $(document).ready(function () {
 
         var laserGeometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 1.4 );
         var laser = new THREE.Mesh( laserGeometry, laserMat );
-        laser.position.set( -position, 0.5, -position-2.5 );
+        laser.position.set( -position, height, -position-2.5 );
         laser.castShadow = true;
         scene.add( laser );
 
@@ -318,7 +319,7 @@ $(document).ready(function () {
 
         var sampleGeometry = new THREE.BoxBufferGeometry( 0.75, 0.55, 0.1 );
         var sample = new THREE.Mesh( sampleGeometry, sampleMat );
-        sample.position.set( -position, 0.4, 0 );
+        sample.position.set( -position, height, 0 );
         sample.rotateY( (params.sampleAngle * Math.PI)/180);
         sample.castShadow = true;
         scene.add( sample );
@@ -338,11 +339,11 @@ $(document).ready(function () {
         //Beam 1
         var beam1Geometry = new THREE.Geometry();
         beam1Geometry.vertices.push(
-            new THREE.Vector3( -position, 0.5, -position-2.5 ),
-            new THREE.Vector3( -position, 0.5, -position ),
-            new THREE.Vector3( -position, 0.5, position ),
-            new THREE.Vector3( position, 0.5, position ),
-            new THREE.Vector3( position, 0.5, position+2.5)
+            new THREE.Vector3( -position, height, -position-2.5 ),
+            new THREE.Vector3( -position, height, -position ),
+            new THREE.Vector3( -position, height, position ),
+            new THREE.Vector3( position, height, position ),
+            new THREE.Vector3( position, height, position+2.5)
         );
         beam1Geometry.buffersNeedUpdate = true;
         var beam1 = new MeshLine();
@@ -354,11 +355,11 @@ $(document).ready(function () {
         // Beam 2
         var beam2Geometry = new THREE.Geometry();
         beam2Geometry.vertices.push(
-            new THREE.Vector3( -position, 0.5, -position-2.5 ),
-            new THREE.Vector3( -position, 0.5, -position ),
-            new THREE.Vector3( position, 0.5, -position ),
-            new THREE.Vector3( position, 0.5, position ),
-            new THREE.Vector3( position+2.5, 0.5, position)
+            new THREE.Vector3( -position, height, -position-2.5 ),
+            new THREE.Vector3( -position, height, -position ),
+            new THREE.Vector3( position, height, -position ),
+            new THREE.Vector3( position, height, position ),
+            new THREE.Vector3( position+2.5, height, position)
         );
         var beam2 = new MeshLine();
         beam2.setGeometry( beam2Geometry, function( p ) { return 0.1*p } );
@@ -380,7 +381,6 @@ $(document).ready(function () {
         mesh.localToWorld( center );
         return center;
     }
-
 
     /*
      * Render lighting of the simulation
