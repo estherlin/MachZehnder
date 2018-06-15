@@ -214,7 +214,7 @@ $(document).ready(function () {
 
         var laserGeometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 1.4 );
         var laser = new THREE.Mesh( laserGeometry, laserMat );
-        laser.position.set( -position, 0.35, -position-2.5 );
+        laser.position.set( -position, 0.5, -position-2.5 );
         laser.castShadow = true;
         scene.add( laser );
 
@@ -263,7 +263,7 @@ $(document).ready(function () {
 
         // folder 2: all of the view options
         var folder2 = gui.addFolder( 'Laser Parameters' );
-        folder2.add( params, 'beamWidth', 0.0, 5.0, 0.5).onChange( updateBeams );
+        folder2.add( params, 'beamWidth', 0.0, 4.0, 0.2).onChange( updateBeams );
         folder2.add( params, 'laserType', Object.keys( laserType ) ).onChange( updateBeams );
 
         var folder3 = gui.addFolder( 'Sample Parameters' );
@@ -338,10 +338,10 @@ $(document).ready(function () {
         //Beam 1
         var beam1Geometry = new THREE.Geometry();
         beam1Geometry.vertices.push(
-            new THREE.Vector3( -position, 0.35, -position-2.5 ),
-            new THREE.Vector3( -position, 0.4, -position ),
+            new THREE.Vector3( -position, 0.5, -position-2.5 ),
+            new THREE.Vector3( -position, 0.5, -position ),
             new THREE.Vector3( -position, 0.5, position ),
-            new THREE.Vector3( position, 0.4, position ),
+            new THREE.Vector3( position, 0.5, position ),
             new THREE.Vector3( position, 0.5, position+2.5)
         );
         beam1Geometry.buffersNeedUpdate = true;
@@ -354,10 +354,10 @@ $(document).ready(function () {
         // Beam 2
         var beam2Geometry = new THREE.Geometry();
         beam2Geometry.vertices.push(
-            new THREE.Vector3( -position, 0.35, -position-2.5 ),
-            new THREE.Vector3( -position, 0.4, -position ),
+            new THREE.Vector3( -position, 0.5, -position-2.5 ),
+            new THREE.Vector3( -position, 0.5, -position ),
             new THREE.Vector3( position, 0.5, -position ),
-            new THREE.Vector3( position, 0.4, position ),
+            new THREE.Vector3( position, 0.5, position ),
             new THREE.Vector3( position+2.5, 0.5, position)
         );
         var beam2 = new MeshLine();
