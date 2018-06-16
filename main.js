@@ -383,6 +383,14 @@ $(document).ready(function () {
     }
 
     /*
+     * Determines the constructive interference pattern
+     */
+    function interferencePattern() {
+
+    }
+
+
+    /*
      * Render lighting of the simulation
      */
 	function render() {
