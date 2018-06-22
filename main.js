@@ -28,11 +28,6 @@ $(document).ready(function () {
     var beams = [];
     var samples = [];
 
-    // Gaussian beam parameters
-    var rayleigh_range; // TODO: Figure out the magnitude of the step sizes and the beam
-    var radius_curvature;
-
-
 	// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
 	var hemiLuminousIrradiances = {
         "0.0001 lx (Moonless Night)": 0.0001,
@@ -207,7 +202,7 @@ $(document).ready(function () {
         screen2.castShadow = true;
         scene.add( screen2 );
 
-        // TODO: Add the sample
+        // Add the sample
         createSamples();
 
         // TODO: Add the laser source
@@ -370,9 +365,8 @@ $(document).ready(function () {
         beam2.setGeometry( beam2Geometry, function( p ) { return 0.1*p } );
         var beam2Mesh = new THREE.Mesh( beam2.geometry, beamMat );
 
-        // Update Gaussian beam parameters
-        rayleigh_range = Math.PI*params.beamWidth*params.beamWidth/laserType[params.laserType].wavelength;
-        console.log(rayleigh_range);
+        // Update the interference pattern
+        interferencePattern();
 
         // Update
         scene.add( beam2Mesh );
@@ -394,8 +388,28 @@ $(document).ready(function () {
 
     /*
      * Determines the constructive interference pattern
+     * Called by createBeams
      */
     function interferencePattern() {
+
+        // Note: Do not need to worry about the magnitude of the rayleigh constant, 
+        // just need the fraction to be the right magnitude. 
+        
+        // Update Gaussian beam parameters
+        var rayleigh_range = Math.PI*params.beamWidth*params.beamWidth/laserType[params.laserType].wavelength;
+        var laser_length = 2*(offset+position); // Need to add the effect of the sample
+        var radius_curvature = laser_length * ( 1 + Math.pow((rayleigh_range/laser_length) , 2));
+        //console.log(rayleigh_range, radius_curvature);
+
+        // create fringe radii for constructive and destructive interferences
+        var num_fringes = 4;
+        var m_constructive = Array.from(new Array(num_fringes),(val,index)=>index);
+        var m_destructive = Array.from(new Array(num_fringes),(val,index)=>index+0.5);
+
+        //var constructive_fringes = Array.from(new Array(num_fringes),(val,index)=>Math.sqrt(2*params.wavelength*1000*radius_curvature*index));
+        var constructive_fringes = m_constructive.map(elem => Math.sqrt(2*laserType[params.laserType].wavelength**radius_curvature*elem));
+
+        console.log(constructive_fringes);
 
     }
 
