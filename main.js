@@ -18,6 +18,7 @@ $(document).ready(function () {
     // Some dimensional parameters
     var position = 3;
     var height = 0.5;
+    var offset = 2.5; // Distance from the laser/ screens to the beamsplitters
 
     // Other variables that are needed (idk why)
     var stats;
@@ -26,6 +27,11 @@ $(document).ready(function () {
     // Variables for simulation
     var beams = [];
     var samples = [];
+
+    // Gaussian beam parameters
+    var rayleigh_range; // TODO: Figure out the magnitude of the step sizes and the beam
+    var radius_curvature;
+
 
 	// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
 	var hemiLuminousIrradiances = {
@@ -52,7 +58,7 @@ $(document).ready(function () {
     var laserType = {
         "HeNe 543nm": {
             color: new THREE.Color( 0x2ecc71  ),
-            wavelength: 543*Math.pow(10,-9)
+            wavelength: 543*Math.pow(10,-3)
         },
         "HeNe 594 nm": {
             color: new THREE.Color( 0xf7dc6f ),
@@ -83,9 +89,8 @@ $(document).ready(function () {
         sampleAngle: 0.0
     }
 
+    // Timer if we need it
     var clock = new THREE.Clock(); // keeps track of time
-
-    // Colours for beam
 
     // Start the simulation
     init();
@@ -192,12 +197,12 @@ $(document).ready(function () {
 
         var screenGeometry = new THREE.PlaneBufferGeometry( 1.5, 1.5, 1.5 );
         var screen1 = new THREE.Mesh( screenGeometry, screenMat);
-        screen1.position.set( position, height, position+2.5);
+        screen1.position.set( position, height, position+offset);
         screen1.castShadow = true;
         scene.add( screen1 );
 
         var screen2 = new THREE.Mesh( screenGeometry, screenMat);
-        screen2.position.set( position+2.5, height, position);
+        screen2.position.set( position+offset, height, position);
         screen2.rotateY( -Math.PI / 2 );
         screen2.castShadow = true;
         scene.add( screen2 );
@@ -215,7 +220,7 @@ $(document).ready(function () {
 
         var laserGeometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 1.4 );
         var laser = new THREE.Mesh( laserGeometry, laserMat );
-        laser.position.set( -position, height, -position-2.5 );
+        laser.position.set( -position, height, -position-offset );
         laser.castShadow = true;
         scene.add( laser );
 
@@ -339,11 +344,11 @@ $(document).ready(function () {
         //Beam 1
         var beam1Geometry = new THREE.Geometry();
         beam1Geometry.vertices.push(
-            new THREE.Vector3( -position, height, -position-2.5 ),
+            new THREE.Vector3( -position, height, -position-offset ),
             new THREE.Vector3( -position, height, -position ),
             new THREE.Vector3( -position, height, position ),
             new THREE.Vector3( position, height, position ),
-            new THREE.Vector3( position, height, position+2.5)
+            new THREE.Vector3( position, height, position+offset)
         );
         beam1Geometry.buffersNeedUpdate = true;
         var beam1 = new MeshLine();
@@ -355,16 +360,21 @@ $(document).ready(function () {
         // Beam 2
         var beam2Geometry = new THREE.Geometry();
         beam2Geometry.vertices.push(
-            new THREE.Vector3( -position, height, -position-2.5 ),
+            new THREE.Vector3( -position, height, -position-offset ),
             new THREE.Vector3( -position, height, -position ),
             new THREE.Vector3( position, height, -position ),
             new THREE.Vector3( position, height, position ),
-            new THREE.Vector3( position+2.5, height, position)
+            new THREE.Vector3( position+offset, height, position)
         );
         var beam2 = new MeshLine();
         beam2.setGeometry( beam2Geometry, function( p ) { return 0.1*p } );
         var beam2Mesh = new THREE.Mesh( beam2.geometry, beamMat );
 
+        // Update Gaussian beam parameters
+        rayleigh_range = Math.PI*params.beamWidth*params.beamWidth/laserType[params.laserType].wavelength;
+        console.log(rayleigh_range);
+
+        // Update
         scene.add( beam2Mesh );
         beams.push( beam2Mesh );
 
