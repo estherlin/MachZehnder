@@ -27,6 +27,8 @@ $(document).ready(function () {
     // Variables for simulation
     var beams = [];
     var samples = [];
+    var constructive_fringes = [];
+    var destructive_fringes = [];
 
 	// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
 	var hemiLuminousIrradiances = {
@@ -307,6 +309,17 @@ $(document).ready(function () {
         beams = [];
     }
 
+    function clearFringes() {
+        constructive_fringes.forEach( function ( l )  {
+            scene.remove( l );
+        });
+        constructive_fringes = [];
+        destructive_fringes.forEach( function ( l )  {
+            scene.remove( l );
+        });
+        destructive_fringes = [];
+    }
+
     function createSamples() {
         var sampleMat = new THREE.MeshStandardMaterial( {
             transparent: true,
@@ -365,32 +378,21 @@ $(document).ready(function () {
         beam2.setGeometry( beam2Geometry, function( p ) { return 0.1*p } );
         var beam2Mesh = new THREE.Mesh( beam2.geometry, beamMat );
 
-        // Update the interference pattern
-        interferencePattern();
-
         // Update
         scene.add( beam2Mesh );
         beams.push( beam2Mesh );
 
-    }
+        // Update the interference pattern
+        clearFringes();
+        createFringes();
 
-    /*
-     * Function to get the centre point of the object
-     * To get the change in phase.
-     */
-    function getCenterPoint(mesh) {
-        var geometry = mesh.geometry;
-        geometry.computeBoundingBox();
-        center = geometry.boundingBox.getCenter();
-        mesh.localToWorld( center );
-        return center;
     }
 
     /*
      * Determines the constructive interference pattern
      * Called by createBeams
      */
-    function interferencePattern() {
+    function createFringes() {
 
         // Note: Do not need to worry about the magnitude of the rayleigh constant, 
         // just need the fraction to be the right magnitude. 
@@ -399,17 +401,47 @@ $(document).ready(function () {
         var rayleigh_range = Math.PI*params.beamWidth*params.beamWidth/laserType[params.laserType].wavelength;
         var laser_length = 2*(offset+position); // Need to add the effect of the sample
         var radius_curvature = laser_length * ( 1 + Math.pow((rayleigh_range/laser_length) , 2));
-        //console.log(rayleigh_range, radius_curvature);
 
         // create fringe radii for constructive and destructive interferences
-        var num_fringes = 4;
+        var num_fringes = 15;
         var m_constructive = Array.from(new Array(num_fringes),(val,index)=>index);
         var m_destructive = Array.from(new Array(num_fringes),(val,index)=>index+0.5);
 
-        //var constructive_fringes = Array.from(new Array(num_fringes),(val,index)=>Math.sqrt(2*params.wavelength*1000*radius_curvature*index));
-        var constructive_fringes = m_constructive.map(elem => Math.sqrt(2*laserType[params.laserType].wavelength**radius_curvature*elem));
+        var constructive_radii = m_constructive.map(elem => Math.sqrt(2*laserType[params.laserType].wavelength**radius_curvature*elem*1e14));
+        var destructive_radii = m_constructive.map(elem => Math.sqrt(2*laserType[params.laserType].wavelength**radius_curvature*elem*1e14));
 
-        console.log(constructive_fringes);
+        console.log(constructive_radii);
+
+        var fringeMat = new MeshLineMaterial({
+            color: laserType[params.laserType].color,
+            opacity: 0.7,//params.strokes ? .5 : 1,
+            lineWidth: params.beamWidth*0.015,
+            transparent: true,
+            side: THREE.DoubleSide,
+            needsUpdate: true
+        });
+
+        // Loop through and make a fringe at every radii for constructive interference
+        for (i = 0; i < num_fringes; i++) { 
+
+            var geometry = new THREE.Geometry();
+            for( var j = 0; j <= 2*Math.PI; j += Math.PI / 100 ) {
+                var v = new THREE.Vector3( constructive_radii[i]*Math.cos( j ), constructive_radii[i]*Math.sin( j ), 0 );
+                geometry.vertices.push( v );
+            }
+
+            var line = new MeshLine();
+            line.setGeometry( geometry, function( p ) { return 1; } );
+            var fringe = new THREE.Mesh( line.geometry, fringeMat ); // this syntax could definitely be improved!
+            
+            fringe.position.z += position+offset;
+            fringe.position.y += height;
+            fringe.position.x += position;
+            
+            scene.add( fringe );
+
+            constructive_fringes.push( fringe );
+        }
 
     }
 
