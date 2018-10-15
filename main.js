@@ -53,21 +53,13 @@ $(document).ready(function () {
 
     // laser types and their properties
     var laserType = {
-        "HeNe 543nm": {
+        "Green 543nm": {
             color: new THREE.Color( 0x2ecc71  ),
-            wavelength: 543*Math.pow(10,-3)
+            wavelength: 543*Math.pow(10,-9)
         },
-        "HeNe 594 nm": {
-            color: new THREE.Color( 0xf7dc6f ),
-            wavelength: 594*Math.pow(10,-9)
-        },
-        "HeNe 612 nm": {
-            color: new THREE.Color( 0xe67e22 ),
-            wavelength: 612*Math.pow(10,-9)
-        },
-        "HeNe 633 nm": {
-            color: new THREE.Color( 0xe74c3c ),
-            wavelength: 633*Math.pow(10,-9)
+        "IR 1510 nm": {
+            color: new THREE.Color( 0xc0c0c0 ),
+            wavelength: 1510*Math.pow(10,-9)
         }
     };
 
@@ -80,7 +72,7 @@ $(document).ready(function () {
         mirrorAngle: 0,
         shadows: true,
         bulbPower: Object.keys( bulbLuminousPowers )[ 4 ],
-        laserType: Object.keys( laserType )[ 0 ],
+        laserType: Object.keys( laserType )[ 1 ],
         beamWidth: 2.0,
         refractiveIndex: 1,
         sampleAngle: 0.0
@@ -187,6 +179,7 @@ $(document).ready(function () {
         scene.add( mirror2 );
 
         // TODO: Add the screen
+        /*
         var screenMat = new THREE.MeshBasicMaterial( {
             color: 0xF8F9F9,
             side: THREE.DoubleSide
@@ -197,17 +190,13 @@ $(document).ready(function () {
         screen1.position.set( position, height, position+offset);
         screen1.castShadow = true;
         scene.add( screen1 );
-
-        var screen2 = new THREE.Mesh( screenGeometry, screenMat);
-        screen2.position.set( position+offset, height, position);
-        screen2.rotateY( -Math.PI / 2 );
-        screen2.castShadow = true;
-        scene.add( screen2 );
+        */
+        createScreen();
 
         // Add the sample
         createSamples();
 
-        // TODO: Add the laser source
+        // Add the laser source
         var laserMat = new THREE.MeshStandardMaterial( {
             roughness: 0.1,
             color: 0x17202a,
@@ -270,7 +259,7 @@ $(document).ready(function () {
         folder2.add( params, 'laserType', Object.keys( laserType ) ).onChange( updateBeams );
 
         var folder3 = gui.addFolder( 'Sample Parameters' );
-        folder3.add( params, 'refractiveIndex', 0.0, 1.8, 0.1 ).onChange( updateSamples );
+        folder3.add( params, 'refractiveIndex', 1.0, 1.8, 0.1 ).onChange( updateSamples );
         folder3.add( params, 'sampleAngle', -45.0, 45.0, 2.0 ).onChange( updateSamples );
 
         // open the folders for them to take into effect
@@ -360,7 +349,7 @@ $(document).ready(function () {
         );
         beam1Geometry.buffersNeedUpdate = true;
         var beam1 = new MeshLine();
-        beam1.setGeometry( beam1Geometry, function( p ) { return 0.1*p } );
+        beam1.setGeometry( beam1Geometry, function( p ) { return 0.08*p } );
         var beam1Mesh = new THREE.Mesh( beam1.geometry, beamMat );
         scene.add( beam1Mesh );
         beams.push( beam1Mesh );
@@ -371,11 +360,11 @@ $(document).ready(function () {
             new THREE.Vector3( -position, height, -position-offset ),
             new THREE.Vector3( -position, height, -position ),
             new THREE.Vector3( position, height, -position ),
-            new THREE.Vector3( position, height, position ),
-            new THREE.Vector3( position+offset, height, position)
+            new THREE.Vector3( position, height, position )
+            //new THREE.Vector3( position+offset, height, position)
         );
         var beam2 = new MeshLine();
-        beam2.setGeometry( beam2Geometry, function( p ) { return 0.1*p } );
+        beam2.setGeometry( beam2Geometry, function( p ) { return 0.08*p } );
         var beam2Mesh = new THREE.Mesh( beam2.geometry, beamMat );
 
         // Update
@@ -386,6 +375,29 @@ $(document).ready(function () {
         clearFringes();
         createFringes();
 
+    }
+
+    function createScreen() {
+        //Add in the interferences as images
+        var texture = new THREE.TextureLoader().load( "textures/test.bmp" );
+        texture.minFilter = THREE.NearestFilter;
+        texture.magFilter = THREE.NearestFilter;
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.anisotropy = 1;
+        texture.generateMipmaps = false;
+
+
+        var screenMat = new THREE.MeshBasicMaterial( { 
+            map: texture,
+            color: 0xF8F9F9,
+            side: THREE.DoubleSide
+        } );
+
+        var screenGeometry = new THREE.PlaneBufferGeometry( 1.5, 1.5, 1.5 );
+        var screen1 = new THREE.Mesh( screenGeometry, screenMat);
+        screen1.position.set( position, height, position+offset);
+        screen1.castShadow = true;
+        scene.add( screen1 );
     }
 
     /*
