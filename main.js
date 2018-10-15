@@ -56,6 +56,10 @@ $(document).ready(function () {
             color: new THREE.Color( 0x2ecc71  ),
             wavelength: 543*Math.pow(10,-3)
         },
+        "Red 680nm": {
+            color: new THREE.Color( 0xc0392b  ),
+            wavelength: 680*Math.pow(10,-3)
+        },
         "IR 1510 nm": {
             color: new THREE.Color( 0xc0c0c0 ),
             wavelength: 1510*Math.pow(10,-3)
