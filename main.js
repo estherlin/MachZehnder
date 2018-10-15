@@ -17,7 +17,7 @@ $(document).ready(function () {
 
     // Some dimensional parameters
     var position = 3;
-    var height = 0.5;
+    var height = 1.5;
     var offset = 2.5; // Distance from the laser/ screens to the beamsplitters
 
     // Other variables that are needed (idk why)
@@ -55,11 +55,11 @@ $(document).ready(function () {
     var laserType = {
         "Green 543nm": {
             color: new THREE.Color( 0x2ecc71  ),
-            wavelength: 543*Math.pow(10,-9)
+            wavelength: 543*Math.pow(10,-3)
         },
         "IR 1510 nm": {
             color: new THREE.Color( 0xc0c0c0 ),
-            wavelength: 1510*Math.pow(10,-9)
+            wavelength: 1510*Math.pow(10,-3)
         }
     };
 
@@ -79,7 +79,7 @@ $(document).ready(function () {
     }
 
     // Timer if we need it
-    var clock = new THREE.Clock(); // keeps track of time
+    var clock = new THREE.Clock(); // keeps track of time -- idk if i need this
 
     // Start the simulation
     init();
@@ -105,111 +105,18 @@ $(document).ready(function () {
         // Initialize the scene
         scene = new THREE.Scene();
 
-        // Add a point of light to cast shadows
-        var bulbGeometry = new THREE.SphereBufferGeometry( 0.001, 16, 8 );
-        bulbLight = new THREE.PointLight( 0xffee88, 1, 100, 2 );
-        bulbMat = new THREE.MeshStandardMaterial( {
-            emissive: 0xffffee,
-            emissiveIntensity: 1,
-            color: 0x000000
-        });
-        bulbLight.add( new THREE.Mesh( bulbGeometry, bulbMat ) );
-        bulbLight.position.set( 0, 2, 0 );
-        bulbLight.castShadow = true;
-        scene.add( bulbLight );
-
-        // Add hemispherical overall light
-        hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 0.02 );
-        scene.add( hemiLight );
-
-        // Add the floor for this simulation
-        floorMat = new THREE.MeshStandardMaterial( {
-            roughness: 0.9,
-            color: 0x17202A,
-            metalness: 0.2,
-            bumpScale: 0.0015
-        });
-
-        var textureLoader = new THREE.TextureLoader();
-        var floorGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
-        var floorMesh = new THREE.Mesh( floorGeometry, floorMat );
-        floorMesh.receiveShadow = true;
-        floorMesh.rotation.x = -Math.PI / 2.0;
-        scene.add( floorMesh );
-
-        // Add the beam splitter cubes for this simulation
-        cubeMat = new THREE.MeshStandardMaterial( {
-            transparent: true,
-            opacity: 0.5,
-            roughness: 0.7,
-            color: 0x5dade2,
-            bumpScale: 0.002,
-            metalness: 0.2
-        });
-
-        var boxGeometry = new THREE.BoxBufferGeometry( 0.5, height, 0.5 );
-        var boxMesh1 = new THREE.Mesh( boxGeometry, cubeMat );
-        boxMesh1.position.set( -position, 0.5, -position );
-        boxMesh1.castShadow = true;
-        scene.add( boxMesh1 );
-        var boxMesh2 = new THREE.Mesh( boxGeometry, cubeMat );
-        boxMesh2.position.set( position, height, position );
-        boxMesh2.castShadow = true;
-        scene.add( boxMesh2 );
-
-        // TODO: Add the mirrors - need to turn them to 45 degrees
-        var planeMat = new THREE.MeshBasicMaterial( {
-            transparent: true,
-            opacity: 0.6,
-            reflectivity: 1.0,
-            color: 0xF8F9F9,
-            side: THREE.DoubleSide
-        } );
-
-        var planeGeometry = new THREE.CircleBufferGeometry( 0.5, 32 );;
-        var mirror1 = new THREE.Mesh( planeGeometry, planeMat);
-        mirror1.rotateY( -Math.PI / 4 );
-        mirror1.position.set( -position, height, position );
-        mirror1.castShadow = true;
-        scene.add( mirror1 );
-        var mirror2 = new THREE.Mesh( planeGeometry, planeMat);
-        mirror2.rotateY( -Math.PI / 4 );
-        mirror2.position.set( position, height, -position );
-        mirror2.castShadow = true;
-        scene.add( mirror2 );
-
-        // TODO: Add the screen
-        /*
-        var screenMat = new THREE.MeshBasicMaterial( {
-            color: 0xF8F9F9,
-            side: THREE.DoubleSide
-        } );
-
-        var screenGeometry = new THREE.PlaneBufferGeometry( 1.5, 1.5, 1.5 );
-        var screen1 = new THREE.Mesh( screenGeometry, screenMat);
-        screen1.position.set( position, height, position+offset);
-        screen1.castShadow = true;
-        scene.add( screen1 );
-        */
+        // Create the setting: bulb, floor
+        createSetting();
+        // Create the beam splitter cubes for this simulation
+        createBeamSplitters();
+        // Create the mirrors
+        createMirrors();
+        // Create the screen for the interference patterns
         createScreen();
-
         // Add the sample
         createSamples();
-
         // Add the laser source
-        var laserMat = new THREE.MeshStandardMaterial( {
-            roughness: 0.1,
-            color: 0x17202a,
-            metalness: 0.2,
-            bumpScale: 0.0015
-        } );
-
-        var laserGeometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 1.4 );
-        var laser = new THREE.Mesh( laserGeometry, laserMat );
-        laser.position.set( -position, height, -position-offset );
-        laser.castShadow = true;
-        scene.add( laser );
-
+        createLaserSource();
         // Add the laser beams
         createBeams();
 
@@ -378,26 +285,111 @@ $(document).ready(function () {
     }
 
     function createScreen() {
-        //Add in the interferences as images
-        var texture = new THREE.TextureLoader().load( "textures/test.bmp" );
-        texture.minFilter = THREE.NearestFilter;
-        texture.magFilter = THREE.NearestFilter;
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-        texture.anisotropy = 1;
-        texture.generateMipmaps = false;
 
-
-        var screenMat = new THREE.MeshBasicMaterial( { 
-            map: texture,
+        var screenMat = new THREE.MeshBasicMaterial( {
+            //map: texture,
             color: 0xF8F9F9,
             side: THREE.DoubleSide
         } );
 
-        var screenGeometry = new THREE.PlaneBufferGeometry( 1.5, 1.5, 1.5 );
+        var screenGeometry = new THREE.PlaneBufferGeometry( 2.2, 2.2, 1.5 );
         var screen1 = new THREE.Mesh( screenGeometry, screenMat);
         screen1.position.set( position, height, position+offset);
         screen1.castShadow = true;
         scene.add( screen1 );
+    }
+
+    function createMirrors() {
+        var planeMat = new THREE.MeshBasicMaterial( {
+            transparent: true,
+            opacity: 0.6,
+            reflectivity: 1.0,
+            color: 0xF8F9F9,
+            side: THREE.DoubleSide
+        } );
+
+        var planeGeometry = new THREE.CircleBufferGeometry( 0.5, 32 );;
+        var mirror1 = new THREE.Mesh( planeGeometry, planeMat);
+        mirror1.rotateY( -Math.PI / 4 );
+        mirror1.position.set( -position, height, position );
+        mirror1.castShadow = true;
+        scene.add( mirror1 );
+        var mirror2 = new THREE.Mesh( planeGeometry, planeMat);
+        mirror2.rotateY( -Math.PI / 4 );
+        mirror2.position.set( position, height, -position );
+        mirror2.castShadow = true;
+        scene.add( mirror2 );
+    }
+
+    function createLaserSource() {
+        var laserMat = new THREE.MeshStandardMaterial( {
+            roughness: 0.1,
+            color: 0x17202a,
+            metalness: 0.2,
+            bumpScale: 0.0015
+        } );
+
+        var laserGeometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 1.4 );
+        var laser = new THREE.Mesh( laserGeometry, laserMat );
+        laser.position.set( -position, height, -position-offset );
+        laser.castShadow = true;
+        scene.add( laser );
+    }
+
+    function createBeamSplitters() {
+        cubeMat = new THREE.MeshStandardMaterial( {
+            transparent: true,
+            opacity: 0.5,
+            roughness: 0.7,
+            color: 0x5dade2,
+            bumpScale: 0.002,
+            metalness: 0.2
+        });
+
+        var boxGeometry = new THREE.BoxBufferGeometry( 0.5, 0.5, 0.5 );
+        var boxMesh1 = new THREE.Mesh( boxGeometry, cubeMat );
+        boxMesh1.position.set( -position, height, -position );
+        boxMesh1.castShadow = true;
+        scene.add( boxMesh1 );
+        var boxMesh2 = new THREE.Mesh( boxGeometry, cubeMat );
+        boxMesh2.position.set( position, height, position );
+        boxMesh2.castShadow = true;
+        scene.add( boxMesh2 );
+    }
+
+    function createSetting() {
+        // Add a point of light to cast shadows
+        var bulbGeometry = new THREE.SphereBufferGeometry( 0.001, 16, 8 );
+        bulbLight = new THREE.PointLight( 0xffee88, 1, 100, 2 );
+        bulbMat = new THREE.MeshStandardMaterial( {
+            emissive: 0xffffee,
+            emissiveIntensity: 1,
+            color: 0x000000
+        });
+        bulbLight.add( new THREE.Mesh( bulbGeometry, bulbMat ) );
+        bulbLight.position.set( 0, 2, 0 );
+        bulbLight.castShadow = true;
+        scene.add( bulbLight );
+
+        // Add hemispherical overall light
+        hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 0.02 );
+        scene.add( hemiLight );
+
+        // Add the floor for this simulation
+        floorMat = new THREE.MeshStandardMaterial( {
+            roughness: 0.9,
+            color: 0x17202A,
+            metalness: 0.2,
+            bumpScale: 0.0015
+        });
+
+        var textureLoader = new THREE.TextureLoader();
+        var floorGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+        var floorMesh = new THREE.Mesh( floorGeometry, floorMat );
+        floorMesh.receiveShadow = true;
+        floorMesh.rotation.x = -Math.PI / 2.0;
+        scene.add( floorMesh );
+
     }
 
     /*
@@ -406,50 +398,45 @@ $(document).ready(function () {
      */
     function createFringes() {
 
-        // Note: Do not need to worry about the magnitude of the rayleigh constant, 
-        // just need the fraction to be the right magnitude. 
-        
-        // Update Gaussian beam parameters
-        var rayleigh_range = Math.PI*params.beamWidth*params.beamWidth/laserType[params.laserType].wavelength;
-        var laser_length = 2*(offset+position); // Need to add the effect of the sample
-        var radius_curvature = laser_length * ( 1 + Math.pow((rayleigh_range/laser_length) , 2));
+        // create fringe intensities
+        var num_fringes = 80;
+        var pixels = Array.from(new Array(num_fringes),(val,index)=>index);
+        var intensities = pixels.map(elem => Math.pow( Math.cos( elem*Math.sqrt(2)*Math.PI / laserType[params.laserType].wavelength ), 2 ));
 
-        // create fringe radii for constructive and destructive interferences
-        var num_fringes = 15;
-        var m_constructive = Array.from(new Array(num_fringes),(val,index)=>index);
-        var m_destructive = Array.from(new Array(num_fringes),(val,index)=>index+0.5);
+        console.log(intensities);
 
-        var constructive_radii = m_constructive.map(elem => Math.sqrt(2*laserType[params.laserType].wavelength**radius_curvature*elem*1e14));
-        var destructive_radii = m_constructive.map(elem => Math.sqrt(2*laserType[params.laserType].wavelength**radius_curvature*elem*1e14));
-
-        console.log(constructive_radii);
-
-        var fringeMat = new MeshLineMaterial({
-            color: laserType[params.laserType].color,
-            opacity: 0.7,//params.strokes ? .5 : 1,
-            lineWidth: params.beamWidth*0.015,
-            transparent: true,
-            side: THREE.DoubleSide,
-            needsUpdate: true
-        });
 
         // Loop through and make a fringe at every radii for constructive interference
-        for (i = 0; i < num_fringes; i++) { 
+        for (i = 1; i <= num_fringes; i++) {
+
+            var dx = (i - Math.floor( num_fringes/2 ))*2/num_fringes;
 
             var geometry = new THREE.Geometry();
-            for( var j = 0; j <= 2*Math.PI; j += Math.PI / 100 ) {
-                var v = new THREE.Vector3( constructive_radii[i]*Math.cos( j ), constructive_radii[i]*Math.sin( j ), 0 );
-                geometry.vertices.push( v );
-            }
+            geometry.vertices.push(
+                new THREE.Vector3( 0, 1, 0 ),
+                new THREE.Vector3( 0, -1, 0 )
+            );
 
             var line = new MeshLine();
             line.setGeometry( geometry, function( p ) { return 1; } );
+
+            // change pixel intensity
+            intensity_i = intensities[i-1];
+            var fringeMat = new MeshLineMaterial({
+                color: new THREE.Color( intensity_i, intensity_i, intensity_i ),
+                opacity: 0.7,//params.strokes ? .5 : 1,
+                lineWidth: 2/num_fringes,
+                transparent: true,
+                side: THREE.DoubleSide,
+                needsUpdate: true
+            });
+            console.log(fringeMat);
             var fringe = new THREE.Mesh( line.geometry, fringeMat ); // this syntax could definitely be improved!
-            
+
             fringe.position.z += position+offset;
             fringe.position.y += height;
-            fringe.position.x += position;
-            
+            fringe.position.x += position + dx;
+
             scene.add( fringe );
 
             constructive_fringes.push( fringe );
