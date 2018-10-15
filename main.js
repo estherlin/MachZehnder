@@ -28,7 +28,6 @@ $(document).ready(function () {
     var beams = [];
     var samples = [];
     var constructive_fringes = [];
-    var destructive_fringes = [];
 
 	// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
 	var hemiLuminousIrradiances = {
@@ -75,7 +74,8 @@ $(document).ready(function () {
         laserType: Object.keys( laserType )[ 1 ],
         beamWidth: 2.0,
         refractiveIndex: 1,
-        sampleAngle: 0.0
+        sampleAngle: 0.0,
+        sampleThickness: 1
     }
 
     // Timer if we need it
@@ -151,6 +151,7 @@ $(document).ready(function () {
         function updateSamples() {
             clearSamples();
             createSamples();
+            updateBeams();
         }
 
         // folder 1: all of the view options
@@ -167,7 +168,8 @@ $(document).ready(function () {
 
         var folder3 = gui.addFolder( 'Sample Parameters' );
         folder3.add( params, 'refractiveIndex', 1.0, 1.8, 0.1 ).onChange( updateSamples );
-        folder3.add( params, 'sampleAngle', -45.0, 45.0, 2.0 ).onChange( updateSamples );
+        folder3.add( params, 'sampleAngle', -60.0, 60.0, 2.0 ).onChange( updateSamples );
+        folder3.add( params, 'sampleThickness', 0.0, 5.0, 0.5 ).onChange( updateSamples );
 
         // open the folders for them to take into effect
         folder1.open();
@@ -210,10 +212,6 @@ $(document).ready(function () {
             scene.remove( l );
         });
         constructive_fringes = [];
-        destructive_fringes.forEach( function ( l )  {
-            scene.remove( l );
-        });
-        destructive_fringes = [];
     }
 
     function createSamples() {
@@ -226,7 +224,7 @@ $(document).ready(function () {
             metalness: 0.2
         });
 
-        var sampleGeometry = new THREE.BoxBufferGeometry( 0.75, 0.55, 0.1 );
+        var sampleGeometry = new THREE.BoxBufferGeometry( 0.75, 0.55, params.sampleThickness/10 );
         var sample = new THREE.Mesh( sampleGeometry, sampleMat );
         sample.position.set( -position, height, 0 );
         sample.rotateY( (params.sampleAngle * Math.PI)/180);
@@ -398,13 +396,19 @@ $(document).ready(function () {
      */
     function createFringes() {
 
-        // create fringe intensities
+        // camera constants
         var num_fringes = 80;
+        var pixel_size = 3.75;
+
+        // find phase shift
+        var angle1 = params.sampleAngle * Math.PI / 180;
+        var angle2 = Math.asin( Math.sin(angle1)/params.refractiveIndex );
+        var angle_shit = (10/pixel_size)*(1+Math.sin(angle1 - angle2))/Math.cos(angle2);
+        var phi = params.sampleThickness*params.refractiveIndex*angle_shit/(laserType[params.laserType].wavelength);
+
+        // create fringe intensities
         var pixels = Array.from(new Array(num_fringes),(val,index)=>index);
-        var intensities = pixels.map(elem => Math.pow( Math.cos( elem*Math.sqrt(2)*Math.PI / laserType[params.laserType].wavelength ), 2 ));
-
-        console.log(intensities);
-
+        var intensities = pixels.map(elem => Math.pow( Math.cos( (elem*Math.sqrt(2)*Math.PI / laserType[params.laserType].wavelength) - phi ), 2 ));
 
         // Loop through and make a fringe at every radii for constructive interference
         for (i = 1; i <= num_fringes; i++) {
@@ -430,7 +434,6 @@ $(document).ready(function () {
                 side: THREE.DoubleSide,
                 needsUpdate: true
             });
-            console.log(fringeMat);
             var fringe = new THREE.Mesh( line.geometry, fringeMat ); // this syntax could definitely be improved!
 
             fringe.position.z += position+offset;
@@ -443,7 +446,6 @@ $(document).ready(function () {
         }
 
     }
-
 
     /*
      * Render lighting of the simulation
