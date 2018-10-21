@@ -324,18 +324,21 @@ $(document).ready(function () {
     }
 
     function createLaserSource() {
-        var laserMat = new THREE.MeshStandardMaterial( {
-            roughness: 0.1,
-            color: 0x17202a,
-            metalness: 0.2,
-            bumpScale: 0.0015
+        // load in sample from thorlabs
+        var loadingManager = new THREE.LoadingManager( function() {
+            laser.position.set( -position, height, -position-offset );
+            laser.castShadow = true;
+            laser.rotateZ( (-90 * Math.PI)/180);
+            laser.rotateX( (90 * Math.PI)/180);
+            laser.scale.set(12,12,12);
+            scene.add( laser );
         } );
 
-        var laserGeometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 1.4 );
-        var laser = new THREE.Mesh( laserGeometry, laserMat );
-        laser.position.set( -position, height, -position-offset );
-        laser.castShadow = true;
-        scene.add( laser );
+        // collada
+        var loader = new THREE.ColladaLoader( loadingManager );
+        loader.load( 'parts/Thorlabs_NPL41B.dae', function ( collada ) {
+            laser = collada.scene;
+        } );
     }
 
     function createBeamSplitters() {
