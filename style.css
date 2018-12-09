@@ -17,7 +17,7 @@ body {
 
 a {
     color: #FDFEFE;
-    font-size: 14px;
+    font-size: 13px;
     text-decoration: none;
 }
 
@@ -39,6 +39,7 @@ a:hover {
     -moz-transition: opacity 400ms ease-in;
     transition: opacity 400ms ease-in;
     pointer-events: none;
+    overflow-y: initial !important;
 }
 
 .modalDialog:target {
@@ -47,13 +48,14 @@ a:hover {
 }
 
 .modalDialog>div {
-    width: 400px;
+    width: 600px;
     position: relative;
     margin: 10% auto;
     padding: 5px 20px 13px 20px;
     border-radius: 10px;
     background: #FDFEFE;
-    opacity: 0.7;
+    opacity: 0.8;
+    overflow-y: auto;
     /*background: -moz-linear-gradient(#fff, #999);
     background: -webkit-linear-gradient(#fff, #999);
     background: -o-linear-gradient(#fff, #999);*/
@@ -84,7 +86,7 @@ a:hover {
 
 a.button {
     background: #626567;
-    opacity: 0.3;
+    opacity: 0.4;
     border: none;
     color: white;
     padding: 8px 12px;
@@ -105,9 +107,9 @@ a.button:hover {
 
 a.button2 {
     background: #626567;
-    opacity: 0.3;
+    opacity: 0.4;
     border: none;
-    color: white;
+    color: #ffffff;
     padding: 8px 12px;
     text-align: center;
     text-decoration: none;

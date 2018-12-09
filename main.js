@@ -435,8 +435,8 @@ $(document).ready(function () {
             intensity_i = intensities[i-1];
             var fringeMat = new MeshLineMaterial({
                 color: new THREE.Color( intensity_i, intensity_i, intensity_i ),
-                opacity: 0.7,//params.strokes ? .5 : 1,
-                lineWidth: 2/num_fringes+0.01,
+                opacity: params.beamWidth,//params.strokes ? .5 : 1,
+                lineWidth: 2/num_fringes+0.1,
                 transparent: true,
                 side: THREE.DoubleSide,
                 needsUpdate: true
