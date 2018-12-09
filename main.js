@@ -76,10 +76,10 @@ $(document).ready(function () {
         shadows: true,
         bulbPower: Object.keys( bulbLuminousPowers )[ 4 ],
         laserType: Object.keys( laserType )[ 1 ],
-        beamWidth: 2.0,
+        beamWidth: 0.8,
         refractiveIndex: 1,
         sampleAngle: 0.0,
-        sampleThickness: 1
+        sampleThickness: 0.4
     }
 
     // Timer if we need it
@@ -167,13 +167,13 @@ $(document).ready(function () {
 
         // folder 2: all of the view options
         var folder2 = gui.addFolder( 'Laser Parameters' );
-        folder2.add( params, 'beamWidth', 0.0, 4.0, 0.2).onChange( updateBeams );
+        folder2.add( params, 'beamWidth', 0.1, 1.0, 0.1).onChange( updateBeams );
         folder2.add( params, 'laserType', Object.keys( laserType ) ).onChange( updateBeams );
 
         var folder3 = gui.addFolder( 'Sample Parameters' );
         folder3.add( params, 'refractiveIndex', 1.0, 1.8, 0.1 ).onChange( updateSamples );
         folder3.add( params, 'sampleAngle', -60.0, 60.0, 2.0 ).onChange( updateSamples );
-        folder3.add( params, 'sampleThickness', 0.0, 5.0, 0.5 ).onChange( updateSamples );
+        folder3.add( params, 'sampleThickness', 0.1, 1.0, 0.1 ).onChange( updateSamples );
 
         // open the folders for them to take into effect
         folder1.open();
@@ -228,7 +228,7 @@ $(document).ready(function () {
             metalness: 0.2
         });
 
-        var sampleGeometry = new THREE.BoxBufferGeometry( 0.75, 0.55, params.sampleThickness/10 );
+        var sampleGeometry = new THREE.BoxBufferGeometry( 0.75, 0.55, params.sampleThickness/2 );
         var sample = new THREE.Mesh( sampleGeometry, sampleMat );
         sample.position.set( -position, height, 0 );
         sample.rotateY( (params.sampleAngle * Math.PI)/180);
@@ -241,7 +241,7 @@ $(document).ready(function () {
         var beamMat = new MeshLineMaterial({
             color: laserType[params.laserType].color,
             opacity: 0.7,//params.strokes ? .5 : 1,
-            lineWidth: params.beamWidth,
+            lineWidth: params.beamWidth*0.05,
             transparent: true,
             side: THREE.DoubleSide,
             needsUpdate: true
@@ -258,7 +258,7 @@ $(document).ready(function () {
         );
         beam1Geometry.buffersNeedUpdate = true;
         var beam1 = new MeshLine();
-        beam1.setGeometry( beam1Geometry, function( p ) { return 0.08*p } );
+        beam1.setGeometry( beam1Geometry, function( p ) { return 1 } );
         var beam1Mesh = new THREE.Mesh( beam1.geometry, beamMat );
         scene.add( beam1Mesh );
         beams.push( beam1Mesh );
@@ -273,7 +273,7 @@ $(document).ready(function () {
             //new THREE.Vector3( position+offset, height, position)
         );
         var beam2 = new MeshLine();
-        beam2.setGeometry( beam2Geometry, function( p ) { return 0.08*p } );
+        beam2.setGeometry( beam2Geometry, function( p ) { return 1 } );
         var beam2Mesh = new THREE.Mesh( beam2.geometry, beamMat );
 
         // Update
@@ -313,12 +313,12 @@ $(document).ready(function () {
         var planeGeometry = new THREE.CircleBufferGeometry( 0.5, 32 );;
         var mirror1 = new THREE.Mesh( planeGeometry, planeMat);
         mirror1.rotateY( -Math.PI / 4 );
-        mirror1.position.set( -position, height, position );
+        mirror1.position.set( -position-0.015, height, position+0.015 );
         mirror1.castShadow = true;
         scene.add( mirror1 );
         var mirror2 = new THREE.Mesh( planeGeometry, planeMat);
         mirror2.rotateY( -Math.PI / 4 );
-        mirror2.position.set( position, height, -position );
+        mirror2.position.set( position+0.015, height, -position-0.015 );
         mirror2.castShadow = true;
         scene.add( mirror2 );
     }
@@ -411,7 +411,7 @@ $(document).ready(function () {
         var angle1 = params.sampleAngle * Math.PI / 180;
         var angle2 = Math.asin( Math.sin(angle1)/params.refractiveIndex );
         var angle_shit = (10/pixel_size)*(1+Math.sin(angle1 - angle2))/Math.cos(angle2);
-        var phi = params.sampleThickness*params.refractiveIndex*angle_shit/(laserType[params.laserType].wavelength);
+        var phi = params.sampleThickness*5*params.refractiveIndex*angle_shit/(laserType[params.laserType].wavelength);
 
         // create fringe intensities
         var pixels = Array.from(new Array(num_fringes),(val,index)=>index);
@@ -436,7 +436,7 @@ $(document).ready(function () {
             var fringeMat = new MeshLineMaterial({
                 color: new THREE.Color( intensity_i, intensity_i, intensity_i ),
                 opacity: 0.7,//params.strokes ? .5 : 1,
-                lineWidth: 2/num_fringes,
+                lineWidth: 2/num_fringes+0.01,
                 transparent: true,
                 side: THREE.DoubleSide,
                 needsUpdate: true
@@ -471,7 +471,7 @@ $(document).ready(function () {
 		}
 
         if ( beamMat !== undefined ) {
-            beamMat.lineWidth = params.beamWidth;
+            beamMat.lineWidth = params.beamWidth*4;
         }
 
 		bulbLight.power = bulbLuminousPowers[ params.bulbPower ];
