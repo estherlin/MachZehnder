@@ -5,40 +5,13 @@
 		<title>Mach-Zehnder Interferometer Simulation</title>
         <meta name="viewport" content="width=device-width, user-scalable=no,
             minimum-scale=1.0, maximum-scale=1.0">
-        <style>
-			body {
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-			}
-			a {
-				color: #ff0080;
-				text-decoration: none;
-			}
-			a:hover {
-				color: #0080ff;
-			}
-		</style>
+		<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
 	</head>
 	<body>
         <div id="container"></div>
         <div id="info">
             <a href="https://en.wikipedia.org/wiki/Mach–Zehnder_interferometer"
                 target="_blank" rel="noopener">Mach-Zehnder Interferometer</a>
-            <br />
-			<a href="https://github.com/estherlin/MachZehnder"
-				target="_blank" rel="noopener">View Source Code</a>
-			<br />
-            blah blah blah.
         </div>
 
         <script src="js/three.js"></script>
@@ -52,6 +25,17 @@
 
         <script src="js/jquery.min.js"></script>
         <script src="main.js"></script>
+
+		<a href="https://github.com/estherlin/MachZehnder"
+			class="button">View Source</a>
+
+		<a href="#openModal" class="button2">Tutorial</a>
+		<div id="openModal" class="modalDialog">
+		    <div>
+				<a href="#close" title="Close" class="close">X</a>
+		        <h2>Tutorial</h2>
+		        <p>Explain how to use simulation in here</p>
+		    </div>
 
 	</body>
 </html>

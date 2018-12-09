@@ -101,10 +101,10 @@ $(document).ready(function () {
         container.appendChild( stats.dom );
 
         // Initialize the camera and its perspective
-        camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
-        camera.position.x = 12;
+        camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
+        camera.position.x = -4;
         camera.position.z = -8;
-        camera.position.y = 8;
+        camera.position.y = 6;
 
         // Initialize the scene
         scene = new THREE.Scene();
