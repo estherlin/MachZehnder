@@ -32,14 +32,14 @@ a:hover {
     right: 0;
     bottom: 0;
     left: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 1);
     z-index: 99999;
-    opacity: 0;
+    opacity: 0.8;
     -webkit-transition: opacity 400ms ease-in;
     -moz-transition: opacity 400ms ease-in;
     transition: opacity 400ms ease-in;
     pointer-events: none;
-    overflow-y: initial !important;
+    overflow-x: initial !important;
 }
 
 .modalDialog:target {
@@ -55,7 +55,7 @@ a:hover {
     border-radius: 10px;
     background: #FDFEFE;
     opacity: 0.8;
-    overflow-y: auto;
+    overflow-x: auto;
     /*background: -moz-linear-gradient(#fff, #999);
     background: -webkit-linear-gradient(#fff, #999);
     background: -o-linear-gradient(#fff, #999);*/
