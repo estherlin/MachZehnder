@@ -1,66 +1,98 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset=utf-8>
-		<title>Mach-Zehnder Interferometer Simulation</title>
-        <meta name="viewport" content="width=device-width, user-scalable=no,
-            minimum-scale=1.0, maximum-scale=1.0">
-		<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
-	</head>
-	<body>
-        <div id="container"></div>
-        <div id="info">
-			Mach-Zehner Interferometer<br>
-			A physics simulation of the operation of a optical interferometer
+<head>
+    <meta charset=utf-8>
+    <title>Mach-Zehnder Interferometer Simulation</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+</head>
+<body>
+<div id="container"></div>
+<div id="info">
+    <p>Mach-Zehner Interferometer</p>
+</div>
+
+<a href="https://github.com/estherlin/MachZehnder" id="source" class="btn btn-outline-info" role="button">
+    View Source
+</a>
+
+<button id="tutorial" type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#exampleModalLong">
+    Tutorial
+</button>
+
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Tutorial</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>A Mach-Zehnder interferometer is an optical device that
+                    determines relative phase shift between two laser paths.
+                    This phase shift can be caused by a sample, such as changes in
+                    sample thickness, refractive index, or incidence angle.</p>
+
+                <p>The Mach-Zehnder interferometer configuration is shown in
+                    this simulation. A laser emits a monochrome beam. A beam splitter
+                    splits the beams by allowing 50% of the light to be transmitted,
+                    and 50% to be reflected. Two mirrors direct the two beams to meet
+                    at a second beam splitter, which combines the two into one beam.
+                    A detector the propation of the summed beam and the corresponding
+                    fringes. The resultant fringe width are a function of the laser
+                    wavelength.</p>
+
+                <p>This simulation has three sets of parameters that can be
+                    varied by the user: </p>
+                <ol>
+                    <li>View Parameters: Use to change the lighting of simulation.</li>
+                    <li>Laser Parameters: Vary beamWidth to see changes in fringe
+                        intensity. Vary laserType to see different fringe widths.
+                    </li>
+                    <li>Sample Paramters: Vary refractiveIndex to see phase shifts
+                        as a function of refractiveIndex. sampleAngle and
+                        sampleThickness both illustrate the relation between sample
+                        thickness as phase shift.
+                    </li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <br>
+                <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+            </div>
         </div>
+    </div>
+</div>
 
-        <script src="js/three.js"></script>
+</body>
 
-		<script src="js/three.meshline.js"></script>
-		<script src="js/ColladaLoader.js"></script>
-        <script src="js/stats.min.js"></script>
-        <script src="js/dat.gui.min.js"></script>
-        <script src="js/OrbitControls.js"></script>
-        <script src="js/Detector.js"></script>
+<script src="js/three.js"></script>
 
-        <script src="js/jquery.min.js"></script>
-        <script src="main.js"></script>
+<script src="js/three.meshline.js"></script>
+<script src="js/ColladaLoader.js"></script>
+<script src="js/stats.min.js"></script>
+<script src="js/dat.gui.min.js"></script>
+<script src="js/OrbitControls.js"></script>
+<script src="js/Detector.js"></script>
 
-		<a href="https://github.com/estherlin/MachZehnder"
-			class="button">View Source</a>
+<script src="js/jquery.min.js"></script>
+<script src="main.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
 
 
-		<div id="openModal" class="modalDialog">
-		    <div>
-				<a href="#close" title="Close" class="close">X</a>
-		        <h2>Tutorial</h2>
-		        <p>A Mach-Zehnder interferometer is an optical device that
-				determines relative phase shift between two laser paths.
-				This phase shift can be caused by a sample, such as changes in
-				sample thickness, refractive index, or incidence angle.</p>
-
-				<p>The Mach-Zehnder interferometer configuration is shown in
-				this simulation. A laser emits a monochrome beam. A beam splitter
-				splits the beams by allowing 50% of the light to be transmitted,
-				and 50% to be reflected. Two mirrors direct the two beams to meet
-			    at a second beam splitter, which combines the two into one beam.
-			    A detector the propation of the summed beam and the corresponding
-			    fringes. The resultant fringe width are a function of the laser
-			    wavelength.</p>
-
-				<p>This simulation has three sets of parameters that can be
-				varied by the user: </p>
-				<ol>
-				  <li>View Parameters: Use to change the lighting of simulation.</li>
-				  <li>Laser Parameters: Vary beamWidth to see changes in fringe
-					   intensity. Vary laserType to see different fringe widths.</li>
-				  <li>Sample Paramters: Vary refractiveIndex to see phase shifts
-				  	  as a function of refractiveIndex. sampleAngle and
-					  sampleThickness both illustrate the relation between sample
-				      thickness as phase shift. </li>
-				</ol>
-
-		    </div>
-
-	</body>
 </html>
